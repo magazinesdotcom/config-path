@@ -70,7 +70,11 @@ sub _build__config {
     foreach my $file (keys(%{ $anyconf })) {
         $config = $merge->merge($config, $anyconf->{$file});
     }
-    return $config;
+    if(defined($config)) {
+        return $config;
+    }
+
+    return {};
 }
 
 =head2 fetch
