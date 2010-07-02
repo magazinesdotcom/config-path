@@ -31,6 +31,21 @@ has '_config' => (
     lazy_build => 1
 );
 
+=head2 config_options
+
+HashRef of options passed to Config::Any.
+
+=cut
+
+has 'config_options' => (
+    is => 'ro',
+    isa => 'HashRef',
+    default => sub { {
+        flatten_to_hash => 1,
+        use_ext => 1
+    } }
+);
+
 =head2 files
 
 =cut
@@ -48,7 +63,10 @@ has 'files' => (
 sub _build__config {
     my ($self) = @_;
 
-    my $anyconf = Config::Any->load_files({ files => $self->files, flatten_to_hash => 1, use_ext => 1 });
+    my $opts = $self->config_options;
+    $opts->{files} = $self->files;
+
+    my $anyconf = Config::Any->load_files($opts);
 
     my $config = ();
     my $merge = Hash::Merge->new('RIGHT_PRECEDENT');
