@@ -63,10 +63,7 @@ has 'files' => (
 sub _build__config {
     my ($self) = @_;
 
-    my $opts = $self->config_options;
-    $opts->{files} = $self->files;
-
-    my $anyconf = Config::Any->load_files($opts);
+    my $anyconf = Config::Any->load_files({ %{ $self->config_options }, files => $self->files })
 
     my $config = ();
     my $merge = Hash::Merge->new('RIGHT_PRECEDENT');
