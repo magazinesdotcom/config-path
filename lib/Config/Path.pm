@@ -12,14 +12,32 @@ Config::Path - Path-like config API with multiple file support and arbitrary bac
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
     use Config::Path;
 
-    my $foo = Config::Path->new();
-    ...
+    my $conf = Config::Path->new(
+        files => [ 't/conf/configA.yml', 't/conf/configB.yml' ]
+    );
+
+=head1 DESCRIPTION
+
+Config::Path is a Yet Another Config module with a few twists that were desired
+for an internal project:
+
+=over 4
+
+=item Multiple files merged into a single, flat hash
+
+=item Path-based configuration value retrieval
+
+=item Clean, simple implementation
+
+=cut
+
+=head2 Multiple-File Merging
+
+If any of your config files contain the same keys, the "right" file wins, using
+L<Hash::Merge>'s RIGHT_PRECEDENT setting.  In other words, later file's keys
+will have precedence over those loaded earlier.
 
 =head1 ATTRIBUTES
 
@@ -28,7 +46,8 @@ Perhaps a little code snippet.
 has '_config' => (
     is => 'ro',
     isa => 'HashRef',
-    lazy_build => 1
+    lazy_build => 1,
+    clearer => 'reload'
 );
 
 =head2 config_options
@@ -48,17 +67,19 @@ has 'config_options' => (
 
 =head2 files
 
+The list of files that will be parsed for this configuration.
+
 =cut
 
 has 'files' => (
+    traits => [ qw(Array) ],
     is => 'ro',
     isa => 'ArrayRef',
-    default => sub { [] }
+    default => sub { [] },
+    handles => {
+        add_file => 'push'
+    }
 );
-
-=head1 METHODS
-
-=cut
 
 sub _build__config {
     my ($self) = @_;
@@ -77,7 +98,24 @@ sub _build__config {
     return {};
 }
 
-=head2 fetch
+=head1 METHODS
+
+=head2 add_file ($file)
+
+Adds the supplied filename to the list of files that will be loaded.  Note
+that adding a file after you've already loaded a config will not change
+anything.  You'll need to call C<reload> if you want to reread the
+configuration and include the new file.
+
+=head2 fetch ($path)
+
+Get a value from the config file.  As per the name of this module, fetch takes
+a path argument in the form of C</foo/bar/baz>.  This is effectively a
+shorthand way of expressing a series of hash keys.  Whatever value is on
+the end of the keys will be returned.  As such, fetch might return undef,
+scalar, arrayref, hashref or whatever you've stored in the config file.
+
+  my $foo = $config->fetch('/baz/bar/foo');
 
 =cut
 
@@ -92,6 +130,12 @@ sub fetch {
 
     return $conf;
 }
+
+=head2 reload
+
+Rereads the config files specified in C<files>.  Well, actually it just blows
+away the internal state of the config so that the next call will reload the
+configuration.
 
 =head1 AUTHOR
 

@@ -9,4 +9,12 @@ ok(defined($conf));
 cmp_ok($conf->fetch('foo'), 'eq', 'bar', 'got foo key from file 1');
 cmp_ok($conf->fetch('baz'), 'eq', 'gorch', 'got baz key from file 2');
 
+$conf->add_file('t/conf/more.yml');
+
+cmp_ok($conf->fetch('foo'), 'eq', 'bar', 'foo is still correct');
+
+$conf->reload;
+
+cmp_ok($conf->fetch('foo'), 'eq', 'wozjob', 'foo covered by rightmost file (reload worked)');
+
 done_testing;
