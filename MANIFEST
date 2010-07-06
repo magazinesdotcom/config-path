@@ -16,4 +16,5 @@ README
 t/conf/more.yml
 t/conf/other.yml
 t/conf/simple.yml
+t/mask.t
 t/simple.t
