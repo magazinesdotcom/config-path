@@ -7,6 +7,8 @@ license  'perl';
 
 build_requires 'Test::More';
 
+test_requires 'YAML::XS';
+
 requires 'Moose';
 requires 'Config::Any';
 requires 'Hash::Merge' => '0.12';
