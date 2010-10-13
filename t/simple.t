@@ -13,7 +13,7 @@ cmp_ok($conf->fetch('baz'), 'eq', 'gorch', 'got baz key from file 2');
 $conf->add_file('t/conf/more.yml');
 
 cmp_ok($conf->fetch('foo'), 'eq', 'bar', 'foo is still correct');
-cmp_ok($conf->fetch('foo'), 'eq', 'bar', 'foo is still correct');
+cmp_ok($conf->fetch('baz'), 'eq', 'gorch', 'baz is still correct');
 
 $conf->reload;
 

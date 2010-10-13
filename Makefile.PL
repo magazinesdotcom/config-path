@@ -8,6 +8,7 @@ license  'perl';
 build_requires 'Test::More';
 
 test_requires 'YAML::XS';
+test_requires 'Test::Exception';
 
 requires 'Moose';
 requires 'Config::Any';

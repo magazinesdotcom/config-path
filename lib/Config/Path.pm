@@ -8,7 +8,8 @@ use Hash::Merge;
 
 =head1 NAME
 
-Config::Path - Path-like config API with multiple file support and arbitrary backends from Config::Any
+Config::Path - Path-like config API with multiple file support, directory
+loading and arbitrary backends from Config::Any.
 
 =head1 SYNOPSIS
 
@@ -16,6 +17,12 @@ Config::Path - Path-like config API with multiple file support and arbitrary bac
 
     my $conf = Config::Path->new(
         files => [ 't/conf/configA.yml', 't/conf/configB.yml' ]
+    );
+
+    # Or, if you want to load all files in a directory
+
+    my $dconf = Configh::Path->new(
+        directory => 'myapp/conf'
     );
 
 =head1 DESCRIPTION
@@ -29,6 +36,10 @@ for an internal project:
 
 =item Path-based configuration value retrieval
 
+=item Support for loading all config files in a directory
+
+=item Sane precedence for key collisions
+
 =item Clean, simple implementation
 
 =cut
@@ -38,6 +49,10 @@ for an internal project:
 If any of your config files contain the same keys, the "right" file wins, using
 L<Hash::Merge>'s RIGHT_PRECEDENT setting.  In other words, later file's keys
 will have precedence over those loaded earlier.
+
+Note that when a full directory of files are loaded the files are sorted via
+Perl's C<sort> before merging so as to remove any amigiuity about the order
+in which they will be loaded.
 
 =head1 ATTRIBUTES
 
@@ -65,9 +80,23 @@ has 'config_options' => (
     } }
 );
 
+=head2 directory
+
+A directory in which files should be searched for.  Note that this option is
+mutually-exclusive to the C<files> attribute.  Only set one of them.
+
+=cut
+
+has 'directory' => (
+    is => 'ro',
+    isa => 'Str',
+    predicate => 'has_directory'
+);
+
 =head2 files
 
-The list of files that will be parsed for this configuration.
+The list of files that will be parsed for this configuration.  Note that this
+option is mutually-exclusive to the C<files> attribute.  Only set one of them.
 
 =cut
 
@@ -75,7 +104,7 @@ has 'files' => (
     traits => [ qw(Array) ],
     is => 'ro',
     isa => 'ArrayRef',
-    default => sub { [] },
+    predicate => 'has_files',
     handles => {
         add_file => 'push'
     }
@@ -88,14 +117,50 @@ has '_mask' => (
     clearer => 'clear_mask'
 );
 
+sub BUILD {
+    my ($self) = @_;
+
+    if($self->has_directory && $self->has_files) {
+        die "directory and files are mutually exclusive, choose one"
+    }
+
+    unless($self->has_directory || $self->has_files) {
+        die "One of directory or files must be specified"
+    }
+}
+
 sub _build__config {
     my ($self) = @_;
 
-    my $anyconf = Config::Any->load_files({ %{ $self->config_options }, files => $self->files });
+    # This might be undef, but that's ok.  We'll check later.
+    my $files = $self->files;
+
+    # Check for a directory
+    if($self->has_directory) {
+        my $dir = $self->directory;
+
+        unless(-d $dir) {
+            die "Can't open directory: $dir";
+        }
+
+        opendir(my $dh, $dir);
+        my @files = sort(map("$dir/$_", grep { $_ !~ /^\./ && -f  "$dir/$_" } readdir($dh)));
+        closedir($dh);
+
+        $files = \@files;
+    }
+
+    if(!defined($files) || scalar(@{ $files }) < 1) {
+        warn "No files found.";
+    }
+
+    my $anyconf = Config::Any->load_files({ %{ $self->config_options }, files => $files });
 
     my $config = ();
     my $merge = Hash::Merge->new('RIGHT_PRECEDENT');
-    foreach my $file (keys(%{ $anyconf })) {
+    foreach my $file (@{ $files }) {
+        # Double check that it exists, as Config::Any might not have loaded it
+        next unless exists $anyconf->{$file};
         $config = $merge->merge($config, $anyconf->{$file});
     }
     if(defined($config)) {
