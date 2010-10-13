@@ -1,5 +1,8 @@
 Revision history for Config-Path
 
+0.04    Wed Oct 10, 2010
+    * Add support for directory slurping of config files w/directory attribute
+
 0.03    Sat Jul 10, 2010
     * Add test_requires YAML::XS (Thanks CPAN Testers!)
 
