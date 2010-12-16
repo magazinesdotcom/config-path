@@ -1,5 +1,9 @@
 Revision history for Config-Path
 
+0.06    Thu Dec 16, 2010
+    * Handle arrays (path/to/0/thing)
+    * Don't barf if we're given an unreachable item
+
 0.05    Fri Oct 22, 2010
     * POD fixes
 

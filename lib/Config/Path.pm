@@ -1,7 +1,7 @@
 package Config::Path;
 use Moose;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Config::Any;
 use Hash::Merge;
@@ -61,6 +61,12 @@ attribute then Config::Path will attempt to load all the files in the supplied
 directory via Config::Any.  B<The files will be merged in alphabetical order
 so that there is no ambiguity in the event of a key collision.  Files later
 in the alphabet will override keys of their predecessors.
+
+=head2 Arrays
+
+Arrays can be accessed with paths like C<foo/0/bar>.  Just use the array index
+to descend into that element.  If you attempt to treat a hash like an array
+or an array like hash you will simply get C<undef> back.
 
 =head1 ATTRIBUTES
 
@@ -215,7 +221,15 @@ sub fetch {
 
     my $conf = $self->_config;
     foreach my $piece (split(/\//, $path)) {
-        $conf = $conf->{$piece};
+        if(ref($conf) eq 'HASH') {
+            $conf = $conf->{$piece};
+        } elsif(ref($conf) eq 'ARRAY' && $piece =~ /\d+/) {
+            $conf = $conf->[$piece];
+        } else {
+            # Not sure what they asked for, but it's not gonna work.  Maybe a
+            # string member of an array?
+            $conf = undef;
+        }
         return undef unless defined($conf);
     }
 
