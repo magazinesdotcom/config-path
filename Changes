@@ -1,5 +1,8 @@
 Revision history for Config-Path
 
+0.07    Wed Dec 22, 2010
+    * Strip leading slashes on paths given to fetch()
+
 0.06    Thu Dec 16, 2010
     * Handle arrays (path/to/0/thing)
     * Don't barf if we're given an unreachable item

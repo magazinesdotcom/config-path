@@ -19,4 +19,6 @@ $conf->reload;
 
 cmp_ok($conf->fetch('foo'), 'eq', 'wozjob', 'foo covered by rightmost file (reload worked)');
 
+cmp_ok($conf->fetch('/foo'), 'eq', 'wozjob', 'leading /');
+
 done_testing;

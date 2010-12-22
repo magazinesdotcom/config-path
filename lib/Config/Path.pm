@@ -1,7 +1,7 @@
 package Config::Path;
 use Moose;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Config::Any;
 use Hash::Merge;
@@ -207,6 +207,9 @@ scalar, arrayref, hashref or whatever you've stored in the config file.
 
   my $foo = $config->fetch('baz/bar/foo');
 
+Note that leading slashes will be automatically stripped, just in case you
+prefer the idea of using them.  They are effectively useless though.
+
 =cut
 
 sub fetch {
@@ -218,6 +221,9 @@ sub fetch {
         # Use exists just in case they set the value to undef.
         return $self->_mask->{$path} if exists($self->_mask->{$path});
     }
+
+    $path =~ s/^\///g; # Remove leading slashes, as they don't do anything
+                       # and there's no reason to break over it.
 
     my $conf = $self->_config;
     foreach my $piece (split(/\//, $path)) {
