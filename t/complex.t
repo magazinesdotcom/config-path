@@ -3,9 +3,9 @@ use strict;
 
 use Config::Path;
 
-my $conf = Config::Path->new(directory => 't/conf' );
-
-use Data::Dumper;
+my $conf = Config::Path->new(
+    directory => 't/conf',
+);
 
 cmp_ok($conf->fetch('xml/not'), 'eq', 'empty', 'got value for xml item');
 ok(!defined($conf->fetch('xml/empty')), 'got undef for empty item');
@@ -19,5 +19,14 @@ ok(!defined($conf->fetch('thingies/fart/name')), 'got undef for unreachable (arr
 cmp_ok($conf->fetch('one/for/the'), 'eq', 'hustle', 'deep hash');
 
 ok(!defined($conf->fetch('one/far/the')), 'got undef for unreachable (hash) item');
+
+$conf = Config::Path->new(
+    directory => 't/conf',
+    convert_empty_to_undef => 0
+);
+
+cmp_ok($conf->fetch('xml/not'), 'eq', 'empty', 'got value for xml item');
+ok(ref $conf->fetch('xml/empty') eq 'HASH', 'got hashref for empty xml item');
+
 
 done_testing;

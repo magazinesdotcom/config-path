@@ -1,7 +1,7 @@
 package Config::Path;
 use Moose;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Config::Any;
 use Hash::Merge;
@@ -21,8 +21,14 @@ loading and arbitrary backends from Config::Any.
 
     # Or, if you want to load all files in a directory
 
-    my $dconf = Configh::Path->new(
+    my $dconf = Config::Path->new(
         directory => 'myapp/conf'
+    );
+
+    # If you *DON'T* want to convert empty hashes and arrays to undef
+    # (XML parsing will return <foo></foo> as {})
+    my $conf = Config::Path->new(
+        convert_empty_to_undef => 0
     );
 
 =head1 DESCRIPTION
@@ -131,6 +137,21 @@ has '_mask' => (
     clearer => 'clear_mask'
 );
 
+=head2 convert_empty_to_undef
+
+Defaults to true, if this option is set to false then entities
+fetched that are {} or [] will be kept in tact.
+
+Otherwise Config::Path converts these to undef.
+
+=cut
+
+has 'convert_empty_to_undef' => (
+    is => 'ro',
+    isa => 'Bool',
+    default => 1
+);
+
 sub BUILD {
     my ($self) = @_;
 
@@ -237,6 +258,15 @@ sub fetch {
             $conf = undef;
         }
         return undef unless defined($conf);
+    }
+
+    if ( $self->convert_empty_to_undef ) {
+        if ( ref $conf eq 'HASH' and not keys %$conf ) {
+            $conf = undef;
+        }
+        if ( ref $conf eq 'HASH' and not @$conf ) {
+            $conf = undef;
+        }
     }
 
     return $conf;
