@@ -1,5 +1,8 @@
 Revision history for Config-Path
 
+0.09    Sat Dec 25, 2010
+    * Fixing tests to not die when XML::Simple is not present
+
 0.08    Wed Dec 22, 2010
     * Default conversion option "convert_empty_to_undef",
       specifically for XML config for empty nodes return
