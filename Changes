@@ -1,5 +1,8 @@
 Revision history for Config-Path
 
+0.10    Sat Dec 30, 2010
+    * Fixing tests to not die when XML::Simple is not present for real
+
 0.09    Sat Dec 25, 2010
     * Fixing tests to not die when XML::Simple is not present
 

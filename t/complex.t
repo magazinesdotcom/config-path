@@ -22,11 +22,15 @@ SKIP: {
     eval { require XML::Simple; };
     skip "XML::Simple required for XML testing", 4 if $@;
 
+    $conf = Config::Path->new(
+        directory => 't/conf/xml',
+    );
+
     cmp_ok($conf->fetch('xml/not'), 'eq', 'empty', 'got value for xml item');
     ok(!defined($conf->fetch('xml/empty')), 'got undef for empty item');
 
     $conf = Config::Path->new(
-        directory => 't/conf',
+        directory => 't/conf/xml',
         convert_empty_to_undef => 0
     );
 
