@@ -18,7 +18,7 @@ t/conf/complex.yml
 t/conf/more.yml
 t/conf/other.yml
 t/conf/simple.yml
-t/conf/xml.xml
+t/conf/xml/xml.xml
 t/directory.t
 t/exceptions.t
 t/mask.t
