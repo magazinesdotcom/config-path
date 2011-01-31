@@ -1,7 +1,7 @@
 package Config::Path;
 use Moose;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Config::Any;
 use Hash::Merge;
@@ -262,9 +262,6 @@ sub fetch {
 
     if ( $self->convert_empty_to_undef ) {
         if ( ref $conf eq 'HASH' and not keys %$conf ) {
-            $conf = undef;
-        }
-        if ( ref $conf eq 'HASH' and not @$conf ) {
             $conf = undef;
         }
     }
