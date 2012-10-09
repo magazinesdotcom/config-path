@@ -1,5 +1,9 @@
 Revision history for Config-Path
 
+0.12    Tue Oct 9, 2012
+   * Fix for empty YAML file merging (harlan barnes)
+   * Fix for calling fetch with no path (harlan barnes)
+
 0.11    Mon Jan 31, 2011
     * Remove extra "empty" check that was causing problems when trying to
       return a hashref from fetch.

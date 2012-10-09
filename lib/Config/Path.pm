@@ -1,7 +1,7 @@
 package Config::Path;
 use Moose;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Config::Any;
 use Hash::Merge;
