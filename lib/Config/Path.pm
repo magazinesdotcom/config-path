@@ -196,6 +196,7 @@ sub _build__config {
     foreach my $file (@{ $files }) {
         # Double check that it exists, as Config::Any might not have loaded it
         next unless exists $anyconf->{$file};
+        next unless defined $anyconf->{$file};
         $config = $merge->merge($config, $anyconf->{$file});
     }
     if(defined($config)) {
@@ -243,21 +244,27 @@ sub fetch {
         return $self->_mask->{$path} if exists($self->_mask->{$path});
     }
 
-    $path =~ s/^\///g; # Remove leading slashes, as they don't do anything
-                       # and there's no reason to break over it.
-
     my $conf = $self->_config;
-    foreach my $piece (split(/\//, $path)) {
-        if(ref($conf) eq 'HASH') {
-            $conf = $conf->{$piece};
-        } elsif(ref($conf) eq 'ARRAY' && $piece =~ /\d+/) {
-            $conf = $conf->[$piece];
-        } else {
-            # Not sure what they asked for, but it's not gonna work.  Maybe a
-            # string member of an array?
-            $conf = undef;
+
+    # you should be able to pass nothing and get a hashref back
+    if ( defined $path ) {
+
+        $path =~ s/^\///g; # Remove leading slashes, as they don't do anything
+                           # and there's no reason to break over it.
+
+        foreach my $piece (split(/\//, $path)) {
+            if(ref($conf) eq 'HASH') {
+                $conf = $conf->{$piece};
+            } elsif(ref($conf) eq 'ARRAY' && $piece =~ /\d+/) {
+                $conf = $conf->[$piece];
+            } else {
+                # Not sure what they asked for, but it's not gonna work.  Maybe a
+                # string member of an array?
+                $conf = undef;
+            }
+            return undef unless defined($conf);
         }
-        return undef unless defined($conf);
+
     }
 
     if ( $self->convert_empty_to_undef ) {
