@@ -1,5 +1,8 @@
 Revision history for Config-Path
 
+{{$NEXT}}
+   * Convert to dzil
+
 0.12    Tue Oct 9, 2012
    * Fix for empty YAML file merging (harlan barnes)
    * Fix for calling fetch with no path (harlan barnes)
