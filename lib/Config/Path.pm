@@ -27,7 +27,7 @@ loading and arbitrary backends from Config::Any.
 
     # If you *DON'T* want to convert empty hashes and arrays to undef
     # (XML parsing will return <foo></foo> as {})
-    my $conf = Config::Path->new(
+    my $conf2 = Config::Path->new(
         convert_empty_to_undef => 0
     );
 
